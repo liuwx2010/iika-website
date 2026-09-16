@@ -155,19 +155,62 @@ if (backToTop) {
 }
 
 // ===== Contact Form =====
+const validationMessages = {
+  ja: { name: 'お名前を入力してください', email: 'メールアドレスを入力してください', emailInvalid: '正しいメールアドレスを入力してください', message: 'お問い合わせ内容を入力してください' },
+  en: { name: 'Please enter your name', email: 'Please enter your email', emailInvalid: 'Please enter a valid email address', message: 'Please enter your message' },
+  cn: { name: '请输入您的姓名', email: '请输入邮箱地址', emailInvalid: '请输入正确的邮箱地址', message: '请输入咨询内容' }
+};
+
+function getCurrentLang() {
+  return localStorage.getItem('iika-lang') || 'ja';
+}
+
+function showFieldError(field, msg) {
+  clearFieldError(field);
+  field.style.borderColor = '#ef4444';
+  field.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.12)';
+  const err = document.createElement('span');
+  err.className = 'field-error';
+  err.textContent = msg;
+  err.style.cssText = 'color:#ef4444;font-size:0.75rem;margin-top:4px;display:block;';
+  field.parentNode.appendChild(err);
+}
+
+function clearFieldError(field) {
+  field.style.borderColor = '';
+  field.style.boxShadow = '';
+  const err = field.parentNode.querySelector('.field-error');
+  if (err) err.remove();
+}
+
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
+  // Clear errors on input
+  contactForm.querySelectorAll('input, textarea').forEach(field => {
+    field.addEventListener('input', () => clearFieldError(field));
+  });
+
   contactForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    const formData = new FormData(this);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const company = formData.get('company');
-    const message = formData.get('message');
+    const lang = getCurrentLang();
+    const msgs = validationMessages[lang] || validationMessages.ja;
+    let valid = true;
 
-    const subject = encodeURIComponent(`Website Inquiry from ${name}`);
+    const name = this.querySelector('[name="name"]');
+    const email = this.querySelector('[name="email"]');
+    const message = this.querySelector('[name="message"]');
+
+    if (!name.value.trim()) { showFieldError(name, msgs.name); valid = false; }
+    if (!email.value.trim()) { showFieldError(email, msgs.email); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { showFieldError(email, msgs.emailInvalid); valid = false; }
+    if (!message.value.trim()) { showFieldError(message, msgs.message); valid = false; }
+
+    if (!valid) return;
+
+    const formData = new FormData(this);
+    const subject = encodeURIComponent(`Website Inquiry from ${formData.get('name')}`);
     const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nCompany: ${company}\n\nMessage:\n${message}`
+      `Name: ${formData.get('name')}\nEmail: ${formData.get('email')}\nCompany: ${formData.get('company')}\n\nMessage:\n${formData.get('message')}`
     );
     window.location.href = `mailto:info@iika-jp.com?subject=${subject}&body=${body}`;
   });
