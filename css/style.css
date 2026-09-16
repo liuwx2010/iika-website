@@ -799,6 +799,12 @@ img { max-width: 100%; display: block; }
 .contact-item p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7; }
 .contact-item a { color: var(--primary-blue); }
 .contact-item a:hover { text-decoration: underline; }
+.contact-map {
+  margin-top: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
 
 .contact-form-wrap {
   background: var(--bg-subtle);
