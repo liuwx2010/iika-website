@@ -113,13 +113,16 @@ function animateCounters() {
 // Trigger counters when hero is visible
 const heroSection = document.querySelector('.hero');
 if (heroSection) {
-  const heroObserver = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      animateCounters();
-      heroObserver.unobserve(heroSection);
-    }
-  }, { threshold: 0.3 });
-  heroObserver.observe(heroSection);
+  // Delay slightly so preloader doesn't block
+  setTimeout(() => {
+    const heroObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        animateCounters();
+        heroObserver.unobserve(heroSection);
+      }
+    }, { threshold: 0.1 });
+    heroObserver.observe(heroSection);
+  }, 1600);
 }
 
 // ===== Projects Tabs =====
